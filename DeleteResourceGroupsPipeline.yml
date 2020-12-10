@@ -1,0 +1,38 @@
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: AzurePowerShell@5
+  inputs:
+        function Deletelabs{
+              [Cmdletbinding()]
+          Param()
+          
+          Try{
+              $resourcegroups = get-azresourcegroup -name "*LAB*" 
+                  foreach ($group in $resourcegroups)  
+                  {
+                      remove-azresourcegroup -name $group.resourcegroupname -force
+                      
+                      Write-host "$resourcegroups.count Deleted $resourcegroups.name"
+                     
+                      
+                      }
+                          }
+          Catch{
+              if(!$resourcegroups)
+               {
+                  $ErrorMessage = " No Lab Resource Groups found."
+                  throw $ErrorMessage
+              } else{
+                  Write-Error -Message $_.Exception
+                  throw $_.Exception
+                  }
+              }
+          }
+          
+          Deletelabs
